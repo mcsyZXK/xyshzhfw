@@ -1,0 +1,1 @@
+import{r as e}from"./request--JSIHxJT.js";function o(t){return e({url:"/forum/page",method:"get",params:t})}function u(t){return e({url:`/forum/info/${t}`,method:"get"})}function m(t){return e({url:"/forum/delete",method:"post",data:t})}export{u as a,m as d,o as g};

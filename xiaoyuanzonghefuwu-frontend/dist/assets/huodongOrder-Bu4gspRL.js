@@ -1,0 +1,1 @@
+import{r as e}from"./request-MwhOeuXP.js";function t(r){return e({url:"/huodongOrder/page",method:"get",params:r})}function d(r){return e({url:"/huodongOrder/delete",method:"post",params:{ids:Array.isArray(r)?r.join(","):r}})}export{d,t as g};

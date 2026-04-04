@@ -1,0 +1,1 @@
+import{r as t}from"./request-MwhOeuXP.js";function o(r){return t({url:"/forum/page",method:"get",params:r})}function u(r){return t({url:`/forum/info/${r}`,method:"get"})}function m(r){return t({url:"/forum/save",method:"post",data:r})}function n(r){return t({url:"/forum/delete",method:"post",data:r})}export{u as a,n as d,o as g,m as s};

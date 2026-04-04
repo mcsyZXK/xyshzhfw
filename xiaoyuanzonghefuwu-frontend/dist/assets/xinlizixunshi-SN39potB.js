@@ -1,0 +1,1 @@
+import{r as n}from"./request--JSIHxJT.js";function e(i){return n({url:"/xinlizixunshi/page",method:"get",params:i})}function o(i){return n({url:`/xinlizixunshi/info/${i}`,method:"get"})}function r(i){return n({url:"/xinlizixunshi/login",method:"post",data:i,headers:{"Content-Type":"application/x-www-form-urlencoded"}})}export{o as a,e as g,r as x};

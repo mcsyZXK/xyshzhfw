@@ -1,0 +1,1 @@
+import{r as e}from"./request-Cde25aPT.js";function r(t){return e({url:"/chat/page",method:"get",params:t})}function u(t){return e({url:"/chat/delete",method:"post",data:t})}function o(t){return e({url:"/chat/update",method:"post",data:t})}export{u as d,r as g,o as u};
