@@ -112,3 +112,20 @@ export function yonghuLogin(data) {
     }
   })
 }
+
+// 获取当前普通用户信息
+export function getYonghuSession() {
+  return request({
+    url: '/yonghu/session',
+    method: 'get'
+  })
+}
+
+// 普通用户修改密码
+export function changeYonghuPassword(data) {
+  return request({
+    url: '/yonghu/changePassword',
+    method: 'post',
+    data
+  })
+}

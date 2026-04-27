@@ -84,18 +84,13 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryDao, Dictionary
                 Object typeObject = types.get(obj);
                 if (typeObject != null && StringUtil.isNotEmpty(String.valueOf(typeObject))) { //types的值不为空
                     int i = Integer.parseInt(String.valueOf(typeObject));//type
-                    //把s1字符中的所有大写转小写,并在前面加 _
-                    char[] chars = s.toCharArray();
-                    StringBuffer sbf = new StringBuffer();
-                    for(int  b=0; b< chars.length; b++){
-                        char ch = chars[b];
-                        if(ch <= 90 && ch >= 65){
-                            sbf.append("_");
-                            ch += 32;
-                        }
-                        sbf.append(ch);
+                    String dictionaryKey = buildDictionaryKey(s);
+                    Map<Integer, String> dictionaryDetailMap = dictionaryMap.get(dictionaryKey);
+                    if ((dictionaryDetailMap == null || dictionaryDetailMap.isEmpty()) && dictionaryKey.endsWith("_types")) {
+                        // 兼容历史字典编码：如 wupin_types -> wupin, xunwu_types -> xunwu
+                        String fallbackKey = dictionaryKey.substring(0, dictionaryKey.length() - "_types".length());
+                        dictionaryDetailMap = dictionaryMap.get(fallbackKey);
                     }
-                    Map<Integer, String> dictionaryDetailMap = dictionaryMap.get(sbf.toString());
                     String s2 = dictionaryDetailMap == null ? "" : dictionaryDetailMap.get(i);
                     value.set(obj, s2);
                 } else {
@@ -150,6 +145,23 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryDao, Dictionary
         }
 
         return false;
+    }
+
+    /**
+     * 将驼峰字段转换为字典 key（下划线命名）
+     */
+    private String buildDictionaryKey(String fieldName) {
+        char[] chars = fieldName.toCharArray();
+        StringBuilder sbf = new StringBuilder();
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (ch <= 'Z' && ch >= 'A') {
+                sbf.append('_');
+                ch += 32;
+            }
+            sbf.append(ch);
+        }
+        return sbf.toString();
     }
 
 }

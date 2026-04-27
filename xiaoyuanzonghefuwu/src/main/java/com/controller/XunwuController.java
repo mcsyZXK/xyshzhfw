@@ -160,13 +160,7 @@ public class XunwuController {
     @RequestMapping("/update")
     public R update(@RequestBody XunwuEntity xunwu, HttpServletRequest request){
         logger.debug("update方法:,,Controller:{},,xunwu:{}",this.getClass().getName(),xunwu.toString());
-
         String role = String.valueOf(request.getSession().getAttribute("role"));
-//        if(false)
-//            return R.error(511,"永远不会进入");
-//        else if("用户".equals(role))
-//            xunwu.setYonghuId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
-        //根据字段查询是否有相同数据
         Wrapper<XunwuEntity> queryWrapper = new EntityWrapper<XunwuEntity>()
             .notIn("id",xunwu.getId())
             .andNew()
@@ -180,7 +174,6 @@ public class XunwuController {
             .eq("diushi_tezheng", xunwu.getDiushiTezheng())
             .eq("xunwu_delete", xunwu.getXunwuDelete())
             ;
-
         logger.info("sql语句:"+queryWrapper.getSqlSegment());
         XunwuEntity xunwuEntity = xunwuService.selectOne(queryWrapper);
         if("".equals(xunwu.getXunwuPhoto()) || "null".equals(xunwu.getXunwuPhoto())){

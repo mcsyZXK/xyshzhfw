@@ -356,6 +356,32 @@ public class YonghuController {
         return R.ok();
     }
 
+    /**
+     * 修改密码
+     */
+    @PostMapping(value = "/changePassword")
+    public R changePassword(@RequestBody Map<String, String> params, HttpServletRequest request){
+        Integer userId = (Integer) request.getSession().getAttribute("userId");
+        if(userId == null){
+            return R.error(401, "请先登录");
+        }
+        String oldPassword = params.get("oldPassword");
+        String newPassword = params.get("newPassword");
+        if(StringUtils.isBlank(oldPassword) || StringUtils.isBlank(newPassword)){
+            return R.error("原密码和新密码不能为空");
+        }
+        YonghuEntity yonghu = yonghuService.selectById(userId);
+        if(yonghu == null){
+            return R.error("用户不存在");
+        }
+        if(!oldPassword.equals(yonghu.getPassword())){
+            return R.error("当前密码不正确");
+        }
+        yonghu.setPassword(newPassword);
+        yonghuService.updateById(yonghu);
+        return R.ok("密码修改成功");
+    }
+
 
     /**
      * 忘记密码

@@ -153,13 +153,7 @@ public class WupinController {
     @RequestMapping("/update")
     public R update(@RequestBody WupinEntity wupin, HttpServletRequest request){
         logger.debug("update方法:,,Controller:{},,wupin:{}",this.getClass().getName(),wupin.toString());
-
         String role = String.valueOf(request.getSession().getAttribute("role"));
-//        if(false)
-//            return R.error(511,"永远不会进入");
-//        else if("用户".equals(role))
-//            wupin.setYonghuId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
-        //根据字段查询是否有相同数据
         Wrapper<WupinEntity> queryWrapper = new EntityWrapper<WupinEntity>()
             .notIn("id",wupin.getId())
             .andNew()

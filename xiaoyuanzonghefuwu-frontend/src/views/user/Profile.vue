@@ -3,13 +3,24 @@
     <div class="profile-header">
       <div class="header-content">
         <div class="avatar-section">
-          <el-avatar :size="100" :icon="UserFilled" class="avatar" />
-          <el-button class="edit-avatar-btn" size="small">
-            <el-icon><Camera /></el-icon>
-          </el-button>
+          <el-avatar
+            :size="100"
+            :src="avatarUrl || undefined"
+            :icon="avatarUrl ? undefined : UserFilled"
+            class="avatar"
+          />
+          <el-upload
+            :show-file-list="false"
+            :http-request="handleAvatarUpload"
+            accept="image/*"
+          >
+            <el-button class="edit-avatar-btn" size="small">
+              <el-icon><Camera /></el-icon>
+            </el-button>
+          </el-upload>
         </div>
         <div class="user-info">
-          <h1>{{ userInfo.username || '同学' }}</h1>
+          <h1>{{ form.yonghuName || form.username || '同学' }}</h1>
           <p class="user-role">{{ roleText }}</p>
           <div class="user-stats">
             <div class="stat-item">
@@ -59,7 +70,7 @@
             <template #header>
               <div class="card-header">
                 <span>📋 基本信息</span>
-                <el-button type="primary" size="small" @click="handleSave">
+                <el-button type="primary" size="small" :loading="saveLoading" @click="handleSave">
                   <el-icon><Check /></el-icon>保存
                 </el-button>
               </div>
@@ -70,29 +81,24 @@
                 <el-input v-model="form.username" disabled class="disabled-input" />
               </el-form-item>
 
+              <el-form-item label="昵称">
+                <el-input v-model="form.yonghuName" maxlength="20" show-word-limit placeholder="请输入昵称" />
+              </el-form-item>
+
               <el-form-item label="手机号">
-                <el-input v-model="form.phone" placeholder="请输入手机号" />
+                <el-input v-model="form.yonghuPhone" placeholder="请输入手机号" />
               </el-form-item>
 
               <el-form-item label="邮箱">
-                <el-input v-model="form.email" placeholder="请输入邮箱" />
+                <el-input v-model="form.yonghuEmail" placeholder="请输入邮箱" />
               </el-form-item>
 
               <el-form-item label="性别">
-                <el-radio-group v-model="form.sex">
-                  <el-radio label="男">👦 男</el-radio>
-                  <el-radio label="女">👧 女</el-radio>
-                  <el-radio label="保密">🤫 保密</el-radio>
+                <el-radio-group v-model="form.sexTypes">
+                  <el-radio :label="1">男</el-radio>
+                  <el-radio :label="2">女</el-radio>
+                  <el-radio :label="0">保密</el-radio>
                 </el-radio-group>
-              </el-form-item>
-
-              <el-form-item label="个性签名">
-                <el-input
-                  v-model="form.signature"
-                  type="textarea"
-                  :rows="3"
-                  placeholder="介绍一下自己吧..."
-                />
               </el-form-item>
             </el-form>
           </el-card>
@@ -173,17 +179,23 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { UserFilled, User, Lock, Trophy, Star, Camera, Check } from '@element-plus/icons-vue'
+import { updateUser, getYonghuSession, changeYonghuPassword } from '@/api/user'
+import { uploadImage } from '@/api/file'
+import { resolveFileUrl } from '@/utils/media'
 
 const activeTab = ref('info')
 const userInfo = ref({})
 const roleText = ref('普通用户')
 
 const form = reactive({
+  id: null,
   username: '',
-  phone: '',
-  email: '',
-  sex: '保密',
-  signature: ''
+  yonghuName: '',
+  yonghuPhone: '',
+  yonghuEmail: '',
+  yonghuIdNumber: '',
+  sexTypes: 0,
+  yonghuPhoto: ''
 })
 
 const securityForm = reactive({
@@ -194,29 +206,72 @@ const securityForm = reactive({
 
 const myActivities = ref([])
 const myCollections = ref([])
+const saveLoading = ref(false)
+const currentUserRole = ref('')
+const avatarUrl = computed(() => resolveFileUrl(form.yonghuPhoto))
 
-onMounted(() => {
+const syncLocalUserInfo = (extra = {}) => {
   const user = localStorage.getItem('userInfo')
+  let base = {}
   const role = localStorage.getItem('role')
-  
+
   if (user) {
     try {
-      const userData = JSON.parse(user)
-      userInfo.value = userData
-      form.username = userData.username || '同学'
-      form.phone = userData.phone || ''
-      form.email = userData.email || ''
-    } catch (e) {
+      base = JSON.parse(user)
+    } catch (error) {
       console.error('解析用户信息失败')
     }
   }
-  
+
+  if (!form.username) {
+    form.username = base.username || ''
+    form.yonghuName = base.yonghuName || base.username || ''
+    form.yonghuPhone = base.yonghuPhone || base.phone || ''
+    form.yonghuEmail = base.yonghuEmail || base.email || ''
+    form.yonghuPhoto = base.yonghuPhoto || ''
+  }
+
+  const merged = {
+    ...base,
+    ...extra,
+    username: form.yonghuName || form.username || base.username
+  }
+  if (form.yonghuPhoto) {
+    merged.yonghuPhoto = form.yonghuPhoto
+  }
+  localStorage.setItem('userInfo', JSON.stringify(merged))
+  userInfo.value = merged
+
   if (role === '管理员') {
     roleText.value = '👑 管理员'
-  } else if (role === '心理咨询师' || role === '心里咨询师') {
-    roleText.value = '💚 心理咨询师'
   } else {
     roleText.value = '🎓 同学'
+  }
+}
+
+const loadProfile = async () => {
+  try {
+    const res = await getYonghuSession()
+    const data = res?.data || {}
+    form.id = data.id || null
+    form.username = data.username || ''
+    form.yonghuName = data.yonghuName || data.username || ''
+    form.yonghuPhone = data.yonghuPhone || ''
+    form.yonghuEmail = data.yonghuEmail || ''
+    form.yonghuIdNumber = data.yonghuIdNumber || ''
+    form.sexTypes = Number(data.sexTypes ?? 0)
+    form.yonghuPhoto = data.yonghuPhoto || ''
+    syncLocalUserInfo(data)
+  } catch (error) {
+    console.error('获取用户资料失败:', error)
+  }
+}
+
+onMounted(async () => {
+  currentUserRole.value = localStorage.getItem('userRole') || ''
+  syncLocalUserInfo()
+  if (currentUserRole.value === 'yonghu') {
+    await loadProfile()
   }
 })
 
@@ -224,25 +279,80 @@ const handleMenuSelect = (index) => {
   activeTab.value = index
 }
 
-const handleSave = () => {
-  ElMessage.success('保存成功')
+const handleAvatarUpload = async (option) => {
+  try {
+    const res = await uploadImage(option.file)
+    form.yonghuPhoto = res.file
+    option.onSuccess(res)
+    ElMessage.success('头像上传成功')
+  } catch (error) {
+    option.onError(error)
+    ElMessage.error('头像上传失败')
+  }
 }
 
-const handleChangePassword = () => {
+const handleSave = async () => {
+  if (currentUserRole.value !== 'yonghu') {
+    ElMessage.warning('当前账号暂不支持在此修改资料')
+    return
+  }
+  if (!form.username) {
+    ElMessage.warning('用户信息异常，请重新登录')
+    return
+  }
+  saveLoading.value = true
+  try {
+    await updateUser({
+      id: form.id,
+      username: form.username,
+      yonghuName: form.yonghuName || form.username,
+      yonghuPhone: form.yonghuPhone,
+      yonghuEmail: form.yonghuEmail,
+      yonghuIdNumber: form.yonghuIdNumber,
+      sexTypes: Number(form.sexTypes),
+      yonghuPhoto: form.yonghuPhoto
+    })
+    syncLocalUserInfo()
+    ElMessage.success('保存成功')
+  } catch (error) {
+    console.error('保存用户信息失败:', error)
+  } finally {
+    saveLoading.value = false
+  }
+}
+
+const handleChangePassword = async () => {
+  if (currentUserRole.value !== 'yonghu') {
+    ElMessage.warning('当前账号暂不支持在此修改密码')
+    return
+  }
   if (!securityForm.oldPassword || !securityForm.newPassword) {
     ElMessage.warning('请填写完整密码信息')
     return
   }
-  
+
+  if (securityForm.newPassword.length < 6) {
+    ElMessage.warning('新密码至少 6 位')
+    return
+  }
+
   if (securityForm.newPassword !== securityForm.confirmPassword) {
     ElMessage.warning('两次输入的新密码不一致')
     return
   }
-  
-  ElMessage.success('密码修改成功')
-  securityForm.oldPassword = ''
-  securityForm.newPassword = ''
-  securityForm.confirmPassword = ''
+
+  try {
+    await changeYonghuPassword({
+      oldPassword: securityForm.oldPassword,
+      newPassword: securityForm.newPassword
+    })
+    ElMessage.success('密码修改成功')
+    securityForm.oldPassword = ''
+    securityForm.newPassword = ''
+    securityForm.confirmPassword = ''
+  } catch (error) {
+    console.error('修改密码失败:', error)
+  }
 }
 </script>
 

@@ -73,7 +73,6 @@ public class ForumController {
             params.put("orderBy","id");
         }
         PageUtils page = forumService.queryPage(params);
-
         //字典表数据转换
         List<ForumView> list =(List<ForumView>)page.getList();
         for(ForumView c:list){
@@ -170,16 +169,7 @@ public class ForumController {
     @RequestMapping("/update")
     public R update(@RequestBody ForumEntity forum, HttpServletRequest request){
         logger.debug("update方法:,,Controller:{},,forum:{}",this.getClass().getName(),forum.toString());
-
         String role = String.valueOf(request.getSession().getAttribute("role"));
-//        if(false)
-//            return R.error(511,"永远不会进入");
-//        else if("用户".equals(role))
-//            forum.setYonghuId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
-//        else if("心里咨询师".equals(role))
-//            forum.setXinlizixunshiId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
-//        else if("管理员".equals(role))
-//            forum.setUsersId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
         //根据字段查询是否有相同数据
         Wrapper<ForumEntity> queryWrapper = new EntityWrapper<ForumEntity>()
             .notIn("id",forum.getId())
@@ -192,7 +182,6 @@ public class ForumController {
             .eq("forum_types", forum.getForumTypes())
             .eq("forum_state_types", forum.getForumStateTypes())
             ;
-
         logger.info("sql语句:"+queryWrapper.getSqlSegment());
         ForumEntity forumEntity = forumService.selectOne(queryWrapper);
         forum.setUpdateTime(new Date());

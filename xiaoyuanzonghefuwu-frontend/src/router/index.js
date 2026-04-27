@@ -14,45 +14,6 @@ const routes = [
     meta: { title: '注册' }
   },
   {
-    path: '/counselor',
-    name: 'CounselorLayout',
-    component: () => import('@/layouts/CounselorLayout.vue'),
-    redirect: '/counselor/dashboard',
-    meta: { title: '咨询师端', requiresAuth: true },
-    children: [
-      {
-        path: 'dashboard',
-        name: 'CounselorDashboard',
-        component: () => import('@/views/counselor/Dashboard.vue'),
-        meta: { title: '咨询师工作台', requiresAuth: true }
-      },
-      {
-        path: 'chat',
-        name: 'CounselorChat',
-        component: () => import('@/views/counselor/Chat.vue'),
-        meta: { title: '咨询管理', requiresAuth: true }
-      },
-      {
-        path: 'liuyan',
-        name: 'CounselorLiuyan',
-        component: () => import('@/views/counselor/Liuyan.vue'),
-        meta: { title: '留言管理', requiresAuth: true }
-      },
-      {
-        path: 'forum',
-        name: 'CounselorForum',
-        component: () => import('@/views/counselor/Forum.vue'),
-        meta: { title: '帖子管理', requiresAuth: true }
-      },
-      {
-        path: 'profile',
-        name: 'CounselorProfile',
-        component: () => import('@/views/counselor/Profile.vue'),
-        meta: { title: '个人信息', requiresAuth: true }
-      }
-    ]
-  },
-  {
     path: '/',
     name: 'Layout',
     component: () => import('@/layouts/MainLayout.vue'),
@@ -200,7 +161,6 @@ router.beforeEach((to, from, next) => {
 
   const token = localStorage.getItem('token')
   const role = localStorage.getItem('role')
-  const userRole = localStorage.getItem('userRole')
 
   if (to.meta.requiresAuth && !token) {
     next('/login')
@@ -213,17 +173,6 @@ router.beforeEach((to, from, next) => {
       return
     }
     if (role !== '管理员') {
-      next('/home')
-      return
-    }
-  }
-
-  if (to.path.startsWith('/counselor')) {
-    if (!token) {
-      next('/login')
-      return
-    }
-    if (userRole !== 'xinlizixunshi') {
       next('/home')
       return
     }

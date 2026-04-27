@@ -101,7 +101,7 @@ const router = useRouter()
 const messageListRef = ref(null)
 const showQuickReplies = ref(false)
 
-const chatPartner = ref('心理咨询师')
+const chatPartner = ref('校园助手')
 const inputText = ref('')
 
 const messages = ref([])

@@ -80,7 +80,7 @@
                 <el-avatar :icon="User" :size="40" />
               </div>
               <div class="comment-content">
-                <div class="comment-user">{{ item.yonghuName || item.xinlizixunshiName || '热心同学' }}</div>
+                <div class="comment-user">{{ item.yonghuName || '热心同学' }}</div>
                 <div class="comment-text">{{ item.xunwuLiuyanText || item.replyText || '暂无内容' }}</div>
                 <div class="comment-time">{{ formatTime(item.insertTime) }}</div>
               </div>

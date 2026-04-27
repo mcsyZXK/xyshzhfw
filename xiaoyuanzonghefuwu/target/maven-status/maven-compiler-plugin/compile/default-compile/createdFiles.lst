@@ -53,7 +53,6 @@ com\dao\WupinDao.class
 com\utils\PageUtils.class
 com\entity\vo\HuodongCollectionVO.class
 com\service\XunwuCollectionService.class
-com\websocket\WupinChatWebSocket$1.class
 com\entity\HuodongLiuyanEntity.class
 com\service\ConfigService.class
 com\service\impl\ConfigServiceImpl.class

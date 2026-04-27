@@ -45,7 +45,6 @@
             style="width: 100%"
           >
             <el-option label="普通用户" value="yonghu" />
-            <el-option label="心理咨询师" value="xinlizixunshi" />
             <el-option label="管理员" value="users" />
           </el-select>
         </el-form-item>
@@ -84,7 +83,6 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { login as adminLogin, yonghuLogin } from '@/api/user'
-import { xinlizixunshiLogin } from '@/api/xinlizixunshi'
 
 const router = useRouter()
 const loginFormRef = ref(null)
@@ -105,8 +103,7 @@ const loginRules = {
 const getRoleName = (role) => {
   const roleMap = {
     'users': '管理员',
-    'yonghu': '普通用户',
-    'xinlizixunshi': '心里咨询师'
+    'yonghu': '普通用户'
   }
   return roleMap[role] || '用户'
 }
@@ -115,8 +112,7 @@ const getRoleName = (role) => {
 const getRedirectPath = (role) => {
   const pathMap = {
     'users': '/admin/user',           // 管理员 -> 后台管理
-    'yonghu': '/home',                // 普通用户 -> 首页
-    'xinlizixunshi': '/counselor/dashboard' // 咨询师 -> 咨询师工作台
+    'yonghu': '/home'                 // 普通用户 -> 首页
   }
   return pathMap[role] || '/home'
 }
@@ -139,8 +135,6 @@ const handleLogin = async () => {
         res = await adminLogin(data)
       } else if (loginForm.role === 'yonghu') {
         res = await yonghuLogin(data)
-      } else if (loginForm.role === 'xinlizixunshi') {
-        res = await xinlizixunshiLogin(data)
       }
 
       if (res && (res.code === 0 || res.code === 200)) {

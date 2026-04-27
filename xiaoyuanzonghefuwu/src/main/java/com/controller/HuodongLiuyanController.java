@@ -80,7 +80,6 @@ public class HuodongLiuyanController {
             params.put("orderBy","id");
         }
         PageUtils page = huodongLiuyanService.queryPage(params);
-
         //字典表数据转换
         List<HuodongLiuyanView> list =(List<HuodongLiuyanView>)page.getList();
         for(HuodongLiuyanView c:list){

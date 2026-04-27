@@ -122,13 +122,11 @@ public class HuodongOrderController {
     @RequestMapping("/save")
     public R save(@RequestBody HuodongOrderEntity huodongOrder, HttpServletRequest request){
         logger.debug("save方法:,,Controller:{},,huodongOrder:{}",this.getClass().getName(),huodongOrder.toString());
-
         String role = String.valueOf(request.getSession().getAttribute("role"));
         if(false)
             return R.error(511,"永远不会进入");
         else if("用户".equals(role))
             huodongOrder.setYonghuId(Integer.valueOf(String.valueOf(request.getSession().getAttribute("userId"))));
-
         if(huodongOrder.getHuodongId() == null){
             return R.error("活动不能为空");
         }
@@ -147,7 +145,6 @@ public class HuodongOrderController {
         if(existOrder != null){
             return R.error("当前用户已经预约参与了该活动,不能重复参与");
         }
-
         huodongOrder.setInsertTime(new Date());
         huodongOrder.setCreateTime(new Date());
         huodongOrderService.insert(huodongOrder);

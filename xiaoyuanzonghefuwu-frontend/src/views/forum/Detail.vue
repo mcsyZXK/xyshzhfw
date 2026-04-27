@@ -15,7 +15,7 @@
               <h1 class="post-title">{{ detail.forumName }}</h1>
               <div class="post-meta">
                 <span class="meta-author">
-                  <el-icon><User /></el-icon> {{ detail.yonghuName || detail.xinlizixunshiName || detail.uusername || '楼主' }}
+                  <el-icon><User /></el-icon> {{ detail.yonghuName || detail.uusername || '楼主' }}
                 </span>
                 <span class="meta-time">
                   <el-icon><Clock /></el-icon> {{ formatTime(detail.insertTime) }}
@@ -81,7 +81,7 @@
                 <el-avatar :icon="User" :size="40" />
               </div>
               <div class="reply-content">
-                <div class="reply-user">{{ item.yonghuName || item.xinlizixunshiName || item.uusername || '同学' }}</div>
+                <div class="reply-user">{{ item.yonghuName || item.uusername || '同学' }}</div>
                 <div class="reply-text">{{ getReplyText(item) || '暂无内容' }}</div>
                 <div v-if="getReplyImages(item).length" class="reply-images">
                   <img v-for="img in getReplyImages(item)" :key="img" :src="img" alt="回复图片" />
@@ -99,7 +99,7 @@
           <h3 class="card-title">楼主信息</h3>
           <div class="author-info">
             <el-avatar :size="64" :icon="User" />
-            <div class="author-name">{{ detail.yonghuName || detail.xinlizixunshiName || detail.uusername || '未知' }}</div>
+            <div class="author-name">{{ detail.yonghuName || detail.uusername || '未知' }}</div>
           </div>
         </el-card>
 
